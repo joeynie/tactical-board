@@ -1,0 +1,86 @@
+/* TimelineEditor 容器样式 */
+.timeline-editor {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    background-color: #f9f9f9; /* 浅灰色背景 */
+    border: 1px solid #ddd; /* 边框 */
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影 */
+    width: 100%;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  
+  /* 控制按钮和当前帧显示的容器 */
+  .timeline-controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  /* 按钮样式 */
+  .timeline-button {
+    padding: 8px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #fff;
+    background-color: #007bff; /* 蓝色背景 */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .timeline-button:hover {
+    background-color: #0056b3; /* 深蓝色背景 */
+  }
+  
+  /* 当前帧显示样式 */
+  .timeline-current-frame {
+    font-size: 14px;
+    color: #333;
+  }
+  
+  /* 滑块样式 */
+  .timeline-slider {
+    width: 100%;
+    max-width: 300px;
+    height: 6px;
+    background: #ddd;
+    border-radius: 4px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  .timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #007bff; /* 蓝色滑块 */
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .timeline-slider::-webkit-slider-thumb:hover {
+    background: #0056b3; /* 深蓝色滑块 */
+  }
+  
+  .timeline-slider::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #007bff;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .timeline-slider::-moz-range-thumb:hover {
+    background: #0056b3;
+  }

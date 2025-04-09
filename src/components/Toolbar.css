@@ -1,0 +1,67 @@
+/* 工具栏容器样式 */
+.toolbar-container {
+  display: flex;
+  gap: 10px;
+  padding: 10px;
+  background-color: #f8f9fa; /* 浅灰色背景 */
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 添加阴影 */
+}
+
+/* 按钮的通用样式 */
+.toolbar-button {
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* 添加单位按钮样式 */
+.toolbar-button.clear {
+  background-color: #007bff; /* 蓝色 */
+}
+
+.toolbar-button.clear:hover {
+  background-color: #0056b3; /* 深蓝色 */
+}
+
+/* 保存战术按钮样式 */
+.toolbar-button.save-tactic {
+  background-color: #28a745; /* 绿色 */
+}
+
+.toolbar-button.save-tactic:hover {
+  background-color: #1e7e34; /* 深绿色 */
+}
+
+/* 导出为图片按钮样式 */
+.toolbar-button.export-image {
+  background-color: #dc3545; /* 红色 */
+}
+
+.toolbar-button.export-image:hover {
+  background-color: #a71d2a; /* 深红色 */
+}
+
+/* 导入战术按钮样式 */
+.toolbar-button.import-tactic {
+    background-color: #ffc107; /* 黄色 */
+}
+
+.toolbar-button.import-tactic:hover {
+    background-color: #e0a800; /* 深黄色 */
+}
+.toolbar-button.toggle-draw {
+  background-color: #17a2b8; /* 青色 */
+}
+.toolbar-button.toggle-draw:hover {
+  background-color: #138496; /* 深青色 */
+}
+
+.hidden {
+  display: none;
+}

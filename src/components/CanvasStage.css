@@ -1,0 +1,41 @@
+/* CanvasStage 容器样式 */
+.canvas-stage-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    background-color: #f4f4f4; /* 浅灰色背景 */
+    border: 1px solid #ddd; /* 边框 */
+    border-radius: 8px; /* 圆角 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影 */
+    margin: 20px auto;
+    max-width: 90%;
+  }
+  
+  /* 画布样式 */
+  .canvas-stage {
+    border: 2px solid #000000; /* 蓝色边框 */
+    border-radius: 8px; /* 圆角 */
+    background-color: #ffffff; /* 白色背景 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 阴影 */
+  }
+  
+  /* 圆形元素样式 */
+  .konva-circle {
+    stroke: #000; /* 黑色边框 */
+    stroke-width: 2px;
+  }
+  
+  /* 文本样式 */
+  .konva-text {
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    fill: #333; /* 深灰色字体 */
+  }
+  
+  /* 箭头样式 */
+  .konva-arrow {
+    stroke: #ffcc00; /* 黄色箭头 */
+    stroke-width: 3px;
+    pointer-events: none; /* 禁止鼠标事件 */
+  }
