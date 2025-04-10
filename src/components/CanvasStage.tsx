@@ -45,8 +45,8 @@ const CanvasStage = () => {
         width={canvasWidth}
         height={canvasHeight}
         className="canvas-stage"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
+        onMouseDown={handleMouseDown} onTouchStart={handleMouseDown}
+        onMouseUp={handleMouseUp} onTouchEnd={handleMouseUp}
       >
         <Layer>
           {bg && <KonvaImage image={bg} width={canvasWidth} height={canvasHeight} />}
