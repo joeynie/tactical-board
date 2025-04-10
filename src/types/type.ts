@@ -13,6 +13,7 @@ export interface Arrow {
   y1: number;
   x2: number;
   y2: number;
+  team: string;
 }
 
 export interface Frame {
