@@ -65,3 +65,28 @@
 .hidden {
   display: none;
 }
+
+/* 下拉框样式 */
+.toolbar-select {
+  padding: 8px 12px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #333;
+  outline: none;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.toolbar-select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+}
+
+.toolbar-select option {
+  padding: 8px;
+  background-color: #fff;
+  color: #333;
+}
