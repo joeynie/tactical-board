@@ -9,7 +9,7 @@ const CanvasStage = () => {
   const { moveElement, addArrow } = useCanvasState();
   const { elements, arrows } = useCanvasContext();
   const {addFrame } = useGameData();
-  const [bg, setBg] = useImage("/RMUC2025_grad.png");
+  const [bg, setBg] = useImage("2025field.png");
   const [drawing, setDrawing] = useState(false);
   const [start, setStart] = useState<[number, number, string] | null>(null);
   const {draw} = useToggleDraw();
