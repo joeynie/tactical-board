@@ -2,20 +2,49 @@ import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 
 // 可选视频源
-const videoSources = [
+const videoRecord = [
   {
-    label: "官方回放",
-    url: "https://vod.robomaster.com/803eb42b391371f098434531948c0102/a8ae1c0a08964035a2ddbe5afa3b9720-02d02a03448fb9d77f2b1345f53a794a-ld.mp4",
-  },
-  {
-    label: "直播流",
-    url: "https://rtmp.djicdn.com/robomaster/Mainperspective.m3u8?auth_key=1745313821-0-0-9f1d349f4afcd45096ff75b6a3c7ad50",
-  },
+    label: "交龙-哈工大",
+    url: "https://vod.robomaster.com/50498528389d71f0b3435420848c0102/1eb83d8331d1404ebc42f4e819abcf70-38b3cd5106c23d2283456bca3a5a25d9-ld.mp4",
+  }
 ];
 
 export default function Live() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const [videoSources, setVideoSources] = useState<{ label: string; url: string }[]>(videoRecord);
   const [src, setSrc] = useState(videoSources[0].url);
+
+
+  useEffect(() => {
+    fetch("/live_game_info.json")
+      .then(res => res.json())
+      .then(data => {
+        const sources: { label: string; url: string }[] = [];
+        
+        // console.log("Fetched live game info:", data);
+        for (const zone of data.eventData) {
+          console.log("zone:", zone.zoneName);
+          if (zone.zoneName !== "东部赛区") continue; // 只处理东部赛区
+
+          console.log("zoneLiveString:", zone.zoneLiveString);
+          console.log("fpvData:", zone.fpvData);
+
+          for (const item of zone.zoneLiveString) {
+            if (item && item.src && item.label) {
+              sources.push({ label: item.label, url: item.src });
+            }
+          }
+          for (const item of zone.fpvData) {
+            if (item && item.sources && item.role) {
+              sources.push({ label: item.role, url: item.sources[0].src });
+            }
+          }
+          setVideoSources([...videoRecord, ...sources]);
+          if (sources.length > 0) setSrc(sources[0].url);
+        }
+      });
+    
+  }, []);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -50,7 +79,7 @@ export default function Live() {
           value={src}
           onChange={e => setSrc(e.target.value)}
           className="px-4 py-2 rounded border border-blue-300 shadow focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-blue-700"
-          style={{ fontSize: 16 }}
+          style={{ fontSize: 20 }}
         >
           {videoSources.map((item) => (
             <option key={item.url} value={item.url}>
@@ -62,7 +91,7 @@ export default function Live() {
       <div
         className="flex justify-center items-center bg-white rounded-lg shadow-lg"
         style={{
-          maxWidth: 800,
+          maxWidth: 1400,
           width: "100%",
           aspectRatio: "16/9",
           overflow: "hidden",
@@ -76,7 +105,7 @@ export default function Live() {
           style={{
             width: "100%",
             height: "100%",
-            maxHeight: 450,
+            maxHeight: 800,
             background: "#000",
             borderRadius: 12,
             boxShadow: "0 4px 24px #1976d222",
