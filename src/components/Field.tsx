@@ -32,7 +32,7 @@ const ControlPanel = styled(Box)(({ theme }) => ({
 
 // 创建赛场模型
 function Field() {
-  const texture = useLoader(THREE.TextureLoader, '/2025field.png');
+  const [texture, maskTexture, maskTexture2] = useLoader(THREE.TextureLoader, ['/2025field.png', '/2025field_mask.png', '/2025field_mask2.png']);
 
   return (
     <group>
@@ -40,6 +40,16 @@ function Field() {
         <planeGeometry args={[fieldLength, fieldWidth]} />
         {/* 用图片作为材质贴图 */}
         <meshStandardMaterial map={texture} />
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.2, 0]} receiveShadow>
+        <planeGeometry args={[fieldLength, fieldWidth]} />
+        {/* 用图片作为材质贴图 */}
+        <meshStandardMaterial map={texture}  alphaMap={maskTexture} transparent={true}/>
+      </mesh>
+      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.3, 0]} receiveShadow>
+        <planeGeometry args={[fieldLength, fieldWidth]} />
+        {/* 用图片作为材质贴图 */}
+        <meshStandardMaterial map={texture}  alphaMap={maskTexture2} transparent={true}/>
       </mesh>
     </group>
   );
