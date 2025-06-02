@@ -5,12 +5,7 @@ import * as THREE from 'three';
 import { Html, useProgress } from '@react-three/drei'
 
 const models = [
-  // { name: "哨兵机器人", url: "/models/sentry.fbx" },
-  // { name: "步兵机器人", url: "models/舵轮步兵.fbx" },
-  // { name: "RMUC2025 map", url: "/models/2025map.fbx" },
   { name: "RMUC2025 map", url: "/models/2025map.glb" },
-  // { name: "24工程", url: "/models/24工程.fbx" },
-  // { name: "aeroplane", url: "/models/drone.fbx" },
 ];
 
 function GLTFModel({ url }: { url: string }) {
@@ -75,35 +70,28 @@ export default function ModelViewer() {
 
       {/* 右侧3D视图 */}
       <div
-        className="flex-1 flex items-center justify-center"
-        style={{ minHeight: 0, minWidth: 0 }}
+        style={{
+          width: "1200px",
+          height: "700px",
+          margin: "0 auto", 
+          position: "relative",
+          borderRadius: 16,
+          boxShadow: "0 4px 24px #1976d222",
+        }}
       >
-        <div
-          style={{
-            width: "1200px",
-            height: "700px",
-            maxWidth: "100vw",
-            maxHeight: "80vh",
-            background: "#fff",
-            borderRadius: 16,
-            boxShadow: "0 4px 24px #1976d222",
-            overflow: "hidden",
-          }}
+        <Canvas
+          camera={{ position: [0, 5, 5], fov: 45}}
+          style={{ width: "100%", height: "100%", display: "block" }}
+          // shadows
         >
-          <Canvas
-            camera={{ position: [0, 5, 5], fov: 45}}
-            style={{ width: "100%", height: "100%", display: "block" }}
-            // shadows
-          >
-            <Suspense fallback={<Loader />}>
-              <ambientLight intensity={0.5} />
-              <directionalLight color="white" position={[2, 5, 2]} intensity={1.0} castShadow />
-              <directionalLight color="white" position={[-2, 5, -2]} intensity={1.0} castShadow />
-              <Model url={currentModel} />
-              <OrbitControls />
-            </Suspense>
-          </Canvas>
-        </div>
+          <Suspense fallback={<Loader />}>
+            <ambientLight intensity={0.5} />
+            <directionalLight color="white" position={[2, 5, 2]} intensity={1.0} castShadow />
+            <directionalLight color="white" position={[-2, 5, -2]} intensity={1.0} castShadow />
+            <Model url={currentModel} />
+            <OrbitControls />
+          </Suspense>
+        </Canvas>
       </div>
     </div>
   );

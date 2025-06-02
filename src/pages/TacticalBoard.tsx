@@ -2,6 +2,7 @@ import { CanvasProvider } from "../types/CanvasContext";
 import CanvasStage from "../components/CanvasStage";
 import Toolbar from "../components/Toolbar";
 import TimelineEditor from "../components/TimelineEditor";
+import FieldStage  from "../components/Field";
 
 export default function TacticalBoard () { 
     return (
@@ -11,6 +12,7 @@ export default function TacticalBoard () {
             <Toolbar />
             <CanvasStage />
             <TimelineEditor />
+            <FieldStage/>
         </div>
     </CanvasProvider>
     );

@@ -53,7 +53,14 @@ export default function Live() {
 
     if (src.endsWith(".m3u8") || src.includes(".m3u8?")) {
       if (Hls.isSupported()) {
-        hls = new Hls();
+        hls = new Hls({
+          liveSyncDurationCount: 3, // 只缓存 3 个 segment
+          maxLiveSyncPlaybackRate: 1.5, // 网络追不上的时候加快播放速度
+          maxBufferLength: 10, // 最多缓存 10 秒
+          enableWorker: true, // 开启 web worker 加速
+          lowLatencyMode: true, //  低延迟模式
+          backBufferLength: 5, // 回退缓冲时间（保留最近 5 秒的已播内容）
+        });
         hls.loadSource(src);
         hls.attachMedia(video);
       } else if (video.canPlayType("application/vnd.apple.mpegurl")) {

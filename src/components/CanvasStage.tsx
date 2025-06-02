@@ -49,7 +49,7 @@ const CanvasStage = () => {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === "Enter") addFrame({ robots: elements });
-    console.log("Enter key pressed");
+    // console.log("Enter key pressed");
   };
 
   return (
