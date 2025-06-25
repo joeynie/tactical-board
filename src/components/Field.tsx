@@ -32,7 +32,7 @@ const ControlPanel = styled(Box)(({ theme }) => ({
 
 // 创建赛场模型
 function Field() {
-  const [texture, maskTexture, maskTexture2] = useLoader(THREE.TextureLoader, ['/2025field.png', '/2025field_mask.png', '/2025field_mask2.png']);
+  const [texture, maskTexture, maskTexture2] = useLoader(THREE.TextureLoader, ['/RMUC2025.png', '/2025field_mask.png', '/2025field_mask2.png']);
 
   return (
     <group>
@@ -163,7 +163,7 @@ function GLTFModel({ url }: { url: string }) {
       });
     }
   });
-  return <primitive position={[0,-0.1,0]} object={gltf.scene} scale={1.0} />;
+  return <primitive position={[0,-0.1,0]} object={gltf.scene} scale={0.01} />;
 }
 
 // 主组件
@@ -222,7 +222,7 @@ const FieldModel: React.FC<FieldModelProps> = ({ trackData, currentFrame, showTr
             shadow-mapSize-height={2048}
           />
           <Field />
-            <GLTFModel url={"/models/2025map.glb"}/>
+            <GLTFModel url={"/models/RMUC2025map_rendered.glb"}/>
           {showTrails &&
             Object.entries(trackHistory).map(([id, points]) =>
               points.length > 1 &&

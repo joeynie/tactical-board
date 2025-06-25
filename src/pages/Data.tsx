@@ -3,12 +3,14 @@ import { useGLTF, useFBX, OrbitControls, Environment } from "@react-three/drei";
 import { useState,Suspense } from 'react';
 import * as THREE from 'three';
 import { Html, useProgress } from '@react-three/drei'
+import { scale } from 'framer-motion';
 
 const models = [
-  { name: "RMUC2025 map", url: "/models/2025map.glb" },
+  { name: "RMUC2025区域赛 map", url: "/models/2025map.glb",scale: 1 },
+  { name: "RMUC2025国赛 map", url: "/models/RMUC2025map_rendered.glb", scale: 0.01 },
 ];
 
-function GLTFModel({ url }: { url: string }) {
+function GLTFModel({ url, scale }: { url: string, scale: number }) {
   const gltf = useGLTF(url, true);
   gltf.scene.traverse((child: any) => {
     if (child.isMesh) {
@@ -19,10 +21,10 @@ function GLTFModel({ url }: { url: string }) {
       });
     }
   });
-  return <primitive object={gltf.scene} scale={0.3} />;
+  return <primitive object={gltf.scene} scale={scale} />;
 }
 
-function FBXModel({ url }: { url: string }) {
+function FBXModel({ url, scale }: { url: string, scale: number }) {
   const fbx = useFBX(url);
   fbx.traverse((child: any) => {
     if (child.isMesh) {
@@ -30,14 +32,14 @@ function FBXModel({ url }: { url: string }) {
       child.receiveShadow = true;
     }
   });
-  return <primitive object={fbx} scale={0.3} />;
+  return <primitive object={fbx} scale={scale} />;
 }
 
-function Model({ url }: { url: string }) {
+function Model({ url, scale }: { url: string, scale: number }) {
   if (url.toLowerCase().endsWith('.glb') || url.toLowerCase().endsWith('.gltf')) {
-    return <GLTFModel url={url} />;
+    return <GLTFModel url={url} scale={scale} />;
   }
-  return <FBXModel url={url} />;
+  return <FBXModel url={url} scale={scale} />;
 }
 
 
@@ -80,7 +82,7 @@ export default function ModelViewer() {
         }}
       >
         <Canvas
-          camera={{ position: [0, 5, 5], fov: 45}}
+          camera={{ position: [0, 15, 15], fov: 45}}
           style={{ width: "100%", height: "100%", display: "block" }}
           // shadows
         >
@@ -88,7 +90,7 @@ export default function ModelViewer() {
             <ambientLight intensity={0.5} />
             <directionalLight color="white" position={[2, 5, 2]} intensity={1.0} castShadow />
             <directionalLight color="white" position={[-2, 5, -2]} intensity={1.0} castShadow />
-            <Model url={currentModel} />
+            <Model url={currentModel} scale={models.find(model => model.url === currentModel)?.scale ?? 1} />
             <OrbitControls />
           </Suspense>
         </Canvas>
