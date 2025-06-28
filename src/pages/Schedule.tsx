@@ -1,10 +1,8 @@
+import VisableMap  from "../components/VisibleMap";
 
 export default function Schedule() {
-  return <div style={{width: "1200px", height: "700px" , margin: "0 auto", position: "relative"}}>
-    {/* <FieldModel
-    trackData={null} // 这里可以传入实际的轨迹数据
-    currentFrame={0} // 当前帧数
-    showTrails={true} 
-  /> */}
+  return <div className="flex flex-col items-center ">
+    <h1 className="text-2xl font-bold mb-4">视域</h1>
+    <VisableMap />
   </div>;
 };

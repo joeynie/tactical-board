@@ -1,0 +1,46 @@
+/* 例如，在你的 CanvasStage.css 文件中 */
+
+/* 包裹容器，用于定位 */
+.canvas-stage-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  position: relative; 
+  margin: 20px auto;
+  max-width: 90%;
+}
+
+/* 图例的样式 */
+.legend-overlay {
+  position: absolute; /* 关键：让图例从文档流中脱离，并相对于父容器定位 */
+  top: 15px;          /* 距离顶部20像素 */
+  left: 15px;         /* 距离左侧20像素 */
+  z-index: 10;        /* 确保图例在Canvas之上 */
+  
+  /* 以下是美化样式 */
+  background-color: rgba(255, 255, 255, 0.295);
+  padding: 10px 15px;
+  border-radius: 8px;
+  color: rgba(102, 102, 102, 0.932);
+  font-size: 14px;
+  pointer-events: none; /* 让鼠标可以穿透图例点击到下面的Canvas */
+}
+
+.legend-overlay div {
+  display: flex;
+  align-items: center;
+  margin-bottom: 5px;
+}
+
+.legend-overlay div:last-child {
+  margin-bottom: 0;
+}
+
+.legend-color-box {
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  margin-right: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
