@@ -72,7 +72,8 @@ const VisableMap = () => {
     const [visible, setVisible] = useState<boolean[][]>([]);
     const [beVisible, setBeVisible] = useState<boolean[][]>([]);
     const [cameraHeight, setCameraHeight] = useState(0.3);
-    const [armorHeight, setArmorHeight] = useState(0.1);
+    const [armorHeight, setArmorHeight] = useState(0.15);
+    const [aimDistance, setAimDistance] = useState(6.0);
 
     const fieldWidth = 28.0;
     const fieldHeight = 15.0;
@@ -244,14 +245,14 @@ const VisableMap = () => {
         for (let x = 0; x < gridWidth; x++) {
             for (let y = 0; y < gridHeight; y++) {
                 const to = gridToWorld({ x: x + 0.5, y: y + 0.5 }); 
-                newVisibleGrid[x][y] = checkCanHit(from, to, 6);
-                newBeVisibleGrid[x][y] = checkCanBeSeen(from, to, 6);
+                newVisibleGrid[x][y] = checkCanHit(from, to, aimDistance);
+                newBeVisibleGrid[x][y] = checkCanBeSeen(from, to, aimDistance);
                 // console.log(`Checking visibility for cell (${x}, ${y}) at position`, `isVisible: ${isVisible}`);
             }
         }
         setVisible(newVisibleGrid);
         setBeVisible(newBeVisibleGrid);
-    }, [position, cameraHeight, armorHeight]);
+    }, [position, cameraHeight, armorHeight, aimDistance]);
 
     useEffect(() => {
         if (!heightMap ) return;
@@ -331,6 +332,18 @@ const VisableMap = () => {
                     step="0.01"
                     value={armorHeight}
                     onChange={(e) => setArmorHeight(parseFloat(e.target.value))}
+                />
+            </div>
+            <div className="slider-control">
+                <label htmlFor="distance">最远距离: {aimDistance.toFixed(1)} m</label>
+                <input
+                    type="range"
+                    id="aimDistance"
+                    min="0.0"
+                    max="15"
+                    step="0.5"
+                    value={aimDistance}
+                    onChange={(e) => setAimDistance(parseFloat(e.target.value))}
                 />
             </div>
         </div>
