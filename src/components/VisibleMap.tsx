@@ -6,6 +6,13 @@ import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 // --- 辅助函数 (对应 C# 的 Utils, Mathf 等) ---
 
+const colorTable = {
+    "可见区域": "rgba(208, 22, 22, 0.5)",
+    "可见且被敌人看到的区域": "rgba(217, 107, 23, 0.5)",
+    "被敌人看到的区域": "rgba(226, 192, 24, 0.5)",
+    "不可见区域": "rgba(0, 0, 0, 0)"
+}
+
 // 线性插值 (对应 Mathf.Lerp)
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 
@@ -58,6 +65,7 @@ function* getCellsOnLine(p1: { x: any; y: any; }, p2: { x: any; y: any; }) {
 
 const VisableMap = () => {
     const [heightMap] = useImage("height.png");
+    const [fieldMap] = useImage("RMUC2025.png");
     const [heightArray, setHeightArray] = useState<number[][]>([]);
     const [position, setPosition] = useState<[number, number]>([0, 0]);
     const [enemyPosition, setEnemyPosition] = useState<[number, number]>([0, 0]);
@@ -204,9 +212,9 @@ const VisableMap = () => {
                 const isBeVisible = beVisible[x][y];
                 
                 // 设置填充颜色
-                ctx.fillStyle = isVisible ? "rgba(208, 22, 22, 0.29)" : "rgba(0,0,0,0)";    // 可见区域为红色半透明
+                ctx.fillStyle = isVisible ? colorTable["可见区域"] : colorTable["不可见区域"];
                 if (isBeVisible) {
-                    ctx.fillStyle = isVisible?"rgba(217, 107, 23, 0.29)":"rgba(226, 192, 24, 0.29)"; // 被敌人看到的区域
+                    ctx.fillStyle = isVisible? colorTable["可见且被敌人看到的区域"] : colorTable["被敌人看到的区域"];
                 }
                 ctx.fillRect(x * gridSizeX, y * gridSizeY, gridSizeX, gridSizeY);
 
@@ -328,16 +336,17 @@ const VisableMap = () => {
         </div>
         <Stage width={width} height={height} className="canvas-stage">
             <Layer>
-                <Image image={heightMap} width={width} height={height} />
+                <Image image={fieldMap} width={width} height={height} />
+                {/* <Image image={heightMap} width={width} height={height} /> */}
             </Layer>
             <Layer>
                 <Image image={offscreenCanvas} ref={imageRef} width={width} height={height} onClick={handleCanvasClick}/>
             </Layer>
         </Stage>
         <div className="legend-overlay"> 
-            <div><span style={{ display: 'inline-block', width: 12, height: 12, backgroundColor: 'rgba(208, 22, 22, 0.22)', marginRight: 5 }}></span>可见区域</div>
-            <div><span style={{ display: 'inline-block', width: 12, height: 12, backgroundColor: 'rgba(217, 107, 23, 0.22)', marginRight: 5 }}></span>可见且被敌人看到的区域</div>
-            <div><span style={{ display: 'inline-block', width: 12, height: 12, backgroundColor: 'rgba(226, 192, 24, 0.22)', marginRight: 5 }}></span>被敌人看到的区域</div>
+            <div><span style={{ display: 'inline-block', width: 12, height: 12, backgroundColor: colorTable["可见区域"], marginRight: 5 }}></span>可见区域</div>
+            <div><span style={{ display: 'inline-block', width: 12, height: 12, backgroundColor: colorTable["可见且被敌人看到的区域"], marginRight: 5 }}></span>可见且被敌人看到的区域</div>
+            <div><span style={{ display: 'inline-block', width: 12, height: 12, backgroundColor: colorTable["被敌人看到的区域"], marginRight: 5 }}></span>被敌人看到的区域</div>
         </div>
     </div>
     );
