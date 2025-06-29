@@ -293,7 +293,7 @@ const VisableMap = () => {
         setVisible(newVisibleGrid);
     }, [enemyPosition]);
     // 事件委托：在整个图像上监听点击事件
-    const handleCanvasClick = (e: KonvaEventObject<MouseEvent>) => {
+    const handleCanvasClick = (e: any) => {
         // 获取相对于 stage 的点击位置
         const stage = e.target.getStage();
         const pos = stage?.getPointerPosition();
@@ -353,7 +353,7 @@ const VisableMap = () => {
                 {/* <Image image={heightMap} width={width} height={height} /> */}
             </Layer>
             <Layer>
-                <Image image={offscreenCanvas} ref={imageRef} width={width} height={height} onClick={handleCanvasClick}/>
+                <Image image={offscreenCanvas} ref={imageRef} width={width} height={height} onClick={handleCanvasClick} onTouchEnd={handleCanvasClick}/>
             </Layer>
         </Stage>
         <div className="legend-overlay"> 
