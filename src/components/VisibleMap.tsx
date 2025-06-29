@@ -63,6 +63,8 @@ const VisableMap = () => {
     const [enemyPosition, setEnemyPosition] = useState<[number, number]>([0, 0]);
     const [visible, setVisible] = useState<boolean[][]>([]);
     const [beVisible, setBeVisible] = useState<boolean[][]>([]);
+    const [cameraHeight, setCameraHeight] = useState(0.3);
+    const [armorHeight, setArmorHeight] = useState(0.1);
 
     const fieldWidth = 28.0;
     const fieldHeight = 15.0;
@@ -121,8 +123,8 @@ const VisableMap = () => {
 
         const startCell = worldToGrid(from);
         const endCell = worldToGrid(to);
-        from.y = heightArray[startCell.x][startCell.y] + 0.3; // 起点高度
-        to.y = heightArray[endCell.x][endCell.y] + 0.1; // 终点高度
+        from.y = heightArray[startCell.x][startCell.y] + cameraHeight; // 起点高度
+        to.y = heightArray[endCell.x][endCell.y] + armorHeight; // 终点高度
         
         // console.log(`Start Cell: ${startCell.x}, ${startCell.y}, End Cell: ${endCell.x}, ${endCell.y}`);
         const totalPlanarDistance = distance2D({x: from.x, y: from.z}, {x: to.x, y: to.z});
@@ -152,8 +154,8 @@ const VisableMap = () => {
 
         const startCell = worldToGrid(from);
         const endCell = worldToGrid(to);
-        from.y = heightArray[startCell.x][startCell.y] + 0.3; // 起点高度
-        to.y = heightArray[endCell.x][endCell.y] + 0.1; // 终点高度
+        from.y = heightArray[startCell.x][startCell.y] + armorHeight; // 起点高度
+        to.y = heightArray[endCell.x][endCell.y] + cameraHeight; // 终点高度
         
         // console.log(`Start Cell: ${startCell.x}, ${startCell.y}, End Cell: ${endCell.x}, ${endCell.y}`);
         const totalPlanarDistance = distance2D({x: from.x, y: from.z}, {x: to.x, y: to.z});
@@ -169,7 +171,7 @@ const VisableMap = () => {
             // 计算当前cell在线段上的插值比例 k
             const k = distance2D({x: from.x, y: from.z}, {x: nodePosition.x, y: nodePosition.z}) / totalPlanarDistance;
             // 对应 C# 的: float height_interpolation = Mathf.Lerp(from.y, to.y, k);
-            const losHeight = lerp(from.y, to.y, (1-k));
+            const losHeight = lerp(from.y, to.y, k);
             // 如果地形高度 >= 视线高度，则被遮挡
             if (terrainHeight >= losHeight) {
                 return false;
@@ -209,7 +211,7 @@ const VisableMap = () => {
                 ctx.fillRect(x * gridSizeX, y * gridSizeY, gridSizeX, gridSizeY);
 
                 // 绘制描边（可选）
-                if (x == position[0] && y == position[1]){
+                if (x === position[0] && y === position[1]){
                     ctx.strokeStyle = "rgba(47, 0, 255, 0.6)";
                     ctx.strokeRect(x * gridSizeX, y * gridSizeY, gridSizeX, gridSizeY);
                 }
@@ -241,7 +243,7 @@ const VisableMap = () => {
         }
         setVisible(newVisibleGrid);
         setBeVisible(newBeVisibleGrid);
-    }, [position]);
+    }, [position, cameraHeight, armorHeight]);
 
     useEffect(() => {
         if (!heightMap ) return;
@@ -251,8 +253,8 @@ const VisableMap = () => {
         const startCell = worldToGrid(from);
         const endCell = worldToGrid(to);
         
-        from.y = heightArray[startCell.x][startCell.y] + 0.3; // 起点高度
-        to.y = heightArray[endCell.x][endCell.y] + 0.1; // 终点高度
+        from.y = heightArray[startCell.x][startCell.y] + cameraHeight; // 起点高度
+        to.y = heightArray[endCell.x][endCell.y] + armorHeight; // 终点高度
         
         const totalPlanarDistance = distance2D({x: from.x, y: from.z}, {x: to.x, y: to.z});
         if (totalPlanarDistance < 1e-6) return; // 起点和终点在同一垂直线上
@@ -290,14 +292,40 @@ const VisableMap = () => {
         
         const x = Math.floor(pos.x / gridSizeX);
         const y = Math.floor(pos.y / gridSizeY);
-
-        if (e.evt.button == 0)
+        
+        if (e.evt.button === 0)
             setPosition([x, y]);
-        else if (e.evt.button == 1) 
+        else if (e.evt.button === 1) 
             setEnemyPosition([x, y]);
     };
     return (
     <div className="canvas-stage-container" >
+        <div className="controls-container">
+            <div className="slider-control">
+                <label htmlFor="cameraHeight">相机高度: {cameraHeight.toFixed(2)} m</label>
+                <input
+                    type="range"
+                    id="cameraHeight"
+                    min="0.1"
+                    max="2"
+                    step="0.01"
+                    value={cameraHeight}
+                    onChange={(e) => setCameraHeight(parseFloat(e.target.value))}
+                />
+            </div>
+            <div className="slider-control">
+                <label htmlFor="armorHeight">装甲板高度: {armorHeight.toFixed(2)} m</label>
+                <input
+                    type="range"
+                    id="armorHeight"
+                    min="0.1"
+                    max="2"
+                    step="0.01"
+                    value={armorHeight}
+                    onChange={(e) => setArmorHeight(parseFloat(e.target.value))}
+                />
+            </div>
+        </div>
         <Stage width={width} height={height} className="canvas-stage">
             <Layer>
                 <Image image={heightMap} width={width} height={height} />
