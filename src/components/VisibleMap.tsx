@@ -2,7 +2,6 @@ import {Stage, Layer, Image, Rect } from "react-konva";
 import useImage from "use-image";
 import "./VisibleMap.css"; // 引入 CSS 文件
 import { useEffect, useMemo, useRef, useState } from "react";
-import { KonvaEventObject } from "konva/lib/Node";
 import Konva from "konva";
 // --- 辅助函数 (对应 C# 的 Utils, Mathf 等) ---
 
@@ -347,13 +346,13 @@ const VisableMap = () => {
                 />
             </div>
         </div>
-        <Stage width={width} height={height} className="canvas-stage">
+        <Stage width={width} height={height} className="canvas-stage" onClick={handleCanvasClick} onTap={handleCanvasClick}>
             <Layer>
                 <Image image={fieldMap} width={width} height={height} />
                 {/* <Image image={heightMap} width={width} height={height} /> */}
             </Layer>
             <Layer>
-                <Image image={offscreenCanvas} ref={imageRef} width={width} height={height} onClick={handleCanvasClick} onTouchEnd={handleCanvasClick}/>
+                <Image image={offscreenCanvas} ref={imageRef} width={width} height={height} />
             </Layer>
         </Stage>
         <div className="legend-overlay"> 
