@@ -2,49 +2,55 @@ import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
 
 // 可选视频源
-const videoRecord = [
-  {
-    label: "交龙-哈工大",
-    url: "https://vod.robomaster.com/50498528389d71f0b3435420848c0102/1eb83d8331d1404ebc42f4e819abcf70-38b3cd5106c23d2283456bca3a5a25d9-ld.mp4",
-  }
-];
+const videoRecord: { label: string; url: string }[] = [];
 
 export default function Live() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoSources, setVideoSources] = useState<{ label: string; url: string }[]>(videoRecord);
-  const [src, setSrc] = useState(videoSources[0].url);
-
+  const [src, setSrc] = useState("");
+  const [zoneName, setZoneName] = useState("全国赛");
+  const [zoneList, setZoneList] = useState<string[]>([]); 
 
   useEffect(() => {
-    fetch("/live_game_info.json")
+    fetch("/live_game_info_国赛.json")
       .then(res => res.json())
       .then(data => {
         const sources: { label: string; url: string }[] = [];
-        
-        // console.log("Fetched live game info:", data);
+        const newZoneList: string[] = []; 
         for (const zone of data.eventData) {
-          console.log("zone:", zone.zoneName);
-          if (zone.zoneName !== "东部赛区") continue; // 只处理东部赛区
+          newZoneList.push(zone.zoneName);
+          if (zone.zoneName === zoneName) {
+            if (zone.zoneLiveString && zone.fpvData){ // 直播
+              console.log("zoneLiveString:", zone.zoneLiveString);
+              console.log("fpvData:", zone.fpvData);
 
-          console.log("zoneLiveString:", zone.zoneLiveString);
-          console.log("fpvData:", zone.fpvData);
-
-          for (const item of zone.zoneLiveString) {
-            if (item && item.src && item.label) {
-              sources.push({ label: item.label, url: item.src });
+              for (const item of zone.zoneLiveString) {
+                if (item && item.src && item.label) {
+                  sources.push({ label: item.label, url: item.src });
+                }
+              }
+              for (const item of zone.fpvData) {
+                if (item && item.sources && item.role) {
+                  sources.push({ label: item.role, url: item.sources[0].src });
+                }
+              }
+              setVideoSources([...videoRecord, ...sources]);
+              if (sources.length > 0) setSrc(sources[0].url);
+            } else if (zone.videos && zone.videos.length > 0) { // 回放
+              for (const video of zone.videos) {
+                if (video.content.title1 && video.content.main_source_url) {
+                  sources.push({ label: video.content.title1, url: video.content.main_source_url });
+                }
+              }
+              setVideoSources([...videoRecord, ...sources]);
+              if (sources.length > 0) setSrc(sources[0].url);
             }
           }
-          for (const item of zone.fpvData) {
-            if (item && item.sources && item.role) {
-              sources.push({ label: item.role, url: item.sources[0].src });
-            }
-          }
-          setVideoSources([...videoRecord, ...sources]);
-          if (sources.length > 0) setSrc(sources[0].url);
         }
+        setZoneList(newZoneList);
       });
     
-  }, []);
+  }, [zoneName]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -76,12 +82,25 @@ export default function Live() {
   }, [src]);
 
   return (
+    <>
+    <h1 className="text-2xl font-semibold mb-4 text-blue-700">比赛直播</h1>
     <div
       className="p-4 flex flex-col items-center"
       style={{ minHeight: "60vh", background: " #e3f0ff 100%  " }}
-    >
-      <div className="text-2xl font-semibold mb-4 text-blue-700">比赛直播</div>
+    >        
       <div className="mb-4">
+        <select
+          value={zoneName}
+          onChange={e => setZoneName(e.target.value)}
+          className="px-4 py-2 rounded border border-blue-300 shadow focus:outline-none focus:ring-2 focus:ring-blue-400 bg-white text-blue-700"
+          style={{ fontSize: 20 }}
+        >
+          {zoneList.map((item) => (
+            <option key={item} value={item}>
+              {item}
+            </option>
+          ))}
+        </select>
         <select
           value={src}
           onChange={e => setSrc(e.target.value)}
@@ -120,5 +139,6 @@ export default function Live() {
         />
       </div>
     </div>
+    </>
   );
 }
