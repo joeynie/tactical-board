@@ -12,7 +12,7 @@ export default function Live() {
   const [zoneList, setZoneList] = useState<string[]>([]); 
 
   useEffect(() => {
-    fetch("/live_game_info_国赛.json")
+    fetch("/live_game_info_国赛2.json")
       .then(res => res.json())
       .then(data => {
         const sources: { label: string; url: string }[] = [];
@@ -20,6 +20,15 @@ export default function Live() {
         for (const zone of data.eventData) {
           newZoneList.push(zone.zoneName);
           if (zone.zoneName === zoneName) {
+            if (zone.videos && zone.videos.length > 0) { // 回放
+              for (const video of zone.videos) {
+                if (video.content.title1 && video.content.main_source_url) {
+                  sources.push({ label: video.content.title1, url: video.content.main_source_url });
+                }
+              }
+              setVideoSources([...videoRecord, ...sources]);
+              if (sources.length > 0) setSrc(sources[0].url);
+            }
             if (zone.zoneLiveString && zone.fpvData){ // 直播
               console.log("zoneLiveString:", zone.zoneLiveString);
               console.log("fpvData:", zone.fpvData);
@@ -36,15 +45,7 @@ export default function Live() {
               }
               setVideoSources([...videoRecord, ...sources]);
               if (sources.length > 0) setSrc(sources[0].url);
-            } else if (zone.videos && zone.videos.length > 0) { // 回放
-              for (const video of zone.videos) {
-                if (video.content.title1 && video.content.main_source_url) {
-                  sources.push({ label: video.content.title1, url: video.content.main_source_url });
-                }
-              }
-              setVideoSources([...videoRecord, ...sources]);
-              if (sources.length > 0) setSrc(sources[0].url);
-            }
+            }  
           }
         }
         setZoneList(newZoneList);
