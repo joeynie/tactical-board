@@ -1,9 +1,8 @@
 import { Canvas } from '@react-three/fiber'
-import { useGLTF, useFBX, OrbitControls, Environment } from "@react-three/drei";
+import { useGLTF, useFBX, OrbitControls } from "@react-three/drei";
 import { useState,Suspense } from 'react';
 import * as THREE from 'three';
 import { Html, useProgress } from '@react-three/drei'
-import { scale } from 'framer-motion';
 
 const models = [
   { name: "RMUC2025区域赛 map", url: "/models/2025map.glb",scale: 1 },

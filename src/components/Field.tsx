@@ -3,9 +3,9 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { Canvas, useThree, useFrame, useLoader } from '@react-three/fiber';
 import { Stats, Html, useGLTF } from '@react-three/drei';
-import { Box, FormControlLabel, Switch, Slider } from '@mui/material';
+import { Box, Slider } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import { Unit, Arrow, Frame, Game  } from "../types/type";
+import { Unit, Frame } from "../types/type";
 import { useCanvasContext, useGameData } from "../types/CanvasContext";
 
 const fieldLength = 28;
@@ -168,7 +168,7 @@ function GLTFModel({ url }: { url: string }) {
 
 // 主组件
 const FieldModel: React.FC<FieldModelProps> = ({ trackData, currentFrame, showTrails }) => {
-    const [showStats, setShowStats] = useState(false);
+    const [showStats] = useState(false);
     const [trailLength, setTrailLength] = useState(30);
 
     const { elements } = useCanvasContext();

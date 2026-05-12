@@ -1,42 +1,15 @@
 import React, { useState } from "react";
 import "./Toolbar.css";
 import { useCanvasState } from "../hooks/useCanvasState";
-import { useGameData, useToggleDraw } from "../types/CanvasContext";
+import { useToggleDraw } from "../types/CanvasContext";
 import { exportGameDB, importGameDB ,fetchTacticList} from "../lib/supabaseGame";
-import moment from "moment";
 
 const Toolbar = () => {
   const { clearArrows } = useCanvasState();
-  const { exportGame, importGame } = useGameData();
   const { draw, toggleDraw } = useToggleDraw();
   const [showHidden, setShowHidden] = useState(false);
   const [tacticList, setTacticList] = useState<any[]>([]);
   const [selectedTacticId, setSelectedTacticId] = useState<string>("");
-
-  const exportLocal = () => {
-    const output = exportGame();
-    const blob = new Blob([output], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = "tactic_" + moment().format("YYMMDD-HHmm") + ".json";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  };
-
-  const importLocal = (e: any) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const fileContent = evt.target?.result as string;
-      if (fileContent) {
-        importGame(fileContent);
-      }
-    };
-    reader.readAsText(file);
-  };
 
   const importGameTask = async () => {
     const list = await fetchTacticList();

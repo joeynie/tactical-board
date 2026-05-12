@@ -1,7 +1,7 @@
-import {Stage, Layer, Image, Rect } from "react-konva";
+import {Stage, Layer, Image } from "react-konva";
 import useImage from "use-image";
 import "./VisibleMap.css"; // 引入 CSS 文件
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Konva from "konva";
 // --- 辅助函数 (对应 C# 的 Utils, Mathf 等) ---
 
@@ -11,6 +11,9 @@ const colorTable = {
     "被敌人看到的区域": "rgba(226, 192, 24, 0.5)",
     "不可见区域": "rgba(0, 0, 0, 0)"
 }
+
+const fieldWidth = 28.0;
+const fieldHeight = 15.0;
 
 // 线性插值 (对应 Mathf.Lerp)
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
@@ -74,8 +77,6 @@ const VisableMap = () => {
     const [armorHeight, setArmorHeight] = useState(0.15);
     const [aimDistance, setAimDistance] = useState(6.0);
 
-    const fieldWidth = 28.0;
-    const fieldHeight = 15.0;
     const width = window.innerWidth * 0.6; 
     const height = (width * 150) / 280; // 根据比例计算
     const gridWidth = heightMap?.width || 280; 
@@ -107,17 +108,17 @@ const VisableMap = () => {
         setHeightArray(newHeightValues);
         setVisible(Array(gridWidth).fill(0).map(() => Array(gridHeight).fill(false)));
         setBeVisible(Array(gridWidth).fill(0).map(() => Array(gridHeight).fill(false)));
-    }, [heightMap]);
+    }, [heightMap, gridWidth, gridHeight]);
 
-    const worldToGrid = (pos: { x: any; z: any; y?: any; }) => ({ 
+    const worldToGrid = useCallback((pos: { x: any; z: any; y?: any; }) => ({ 
         x: Math.floor(pos.x / fieldWidth * gridWidth), 
         y: Math.floor(pos.z / fieldHeight * gridHeight) 
-    });
-    const gridToWorld = (gridPos: { x: number; y: number; }) => ({ 
+    }), [gridWidth, gridHeight]);
+    const gridToWorld = useCallback((gridPos: { x: number; y: number; }) => ({ 
         x: gridPos.x / gridWidth * fieldWidth, 
         z: gridPos.y / gridHeight * fieldHeight,
         y: 0
-    });
+    }), [gridWidth, gridHeight]);
 
     /**
      * 对应 C# 的 CheckCanHit
@@ -126,7 +127,7 @@ const VisableMap = () => {
      * @param {number} maxDistance - 最大检测距离
      * @returns {boolean}
      */
-    const checkCanHit = (from: { x: any; z: any; y: any; }, to: { x: any; z: any; y: any; }, maxDistance: number) => {
+    const checkCanHit = useCallback((from: { x: any; z: any; y: any; }, to: { x: any; z: any; y: any; }, maxDistance: number) => {
         if (distance3D(from, to) > maxDistance) return false;
 
         const startCell = worldToGrid(from);
@@ -156,8 +157,8 @@ const VisableMap = () => {
         }
         
         return true;
-    };
-    const checkCanBeSeen = (from: { x: any; z: any; y: any; }, to: { x: any; z: any; y: any; }, maxDistance: number) => {
+    }, [armorHeight, cameraHeight, gridToWorld, heightArray, worldToGrid]);
+    const checkCanBeSeen = useCallback((from: { x: any; z: any; y: any; }, to: { x: any; z: any; y: any; }, maxDistance: number) => {
         if (distance3D(from, to) > maxDistance) return false;
 
         const startCell = worldToGrid(from);
@@ -187,7 +188,7 @@ const VisableMap = () => {
         }
         
         return true;
-    };
+    }, [armorHeight, cameraHeight, gridToWorld, heightArray, worldToGrid]);
     
 
     const offscreenCanvas = useMemo(() => {
@@ -232,7 +233,7 @@ const VisableMap = () => {
             layer.batchDraw();
         }
 
-    }, [visible, width, height, offscreenCanvas]);   
+    }, [visible, beVisible, width, height, offscreenCanvas, gridSizeX, gridSizeY, position]);   
     
     const imageRef = useRef<Konva.Image>(null);
     
@@ -251,7 +252,7 @@ const VisableMap = () => {
         }
         setVisible(newVisibleGrid);
         setBeVisible(newBeVisibleGrid);
-    }, [position, cameraHeight, armorHeight, aimDistance]);
+    }, [position, cameraHeight, armorHeight, aimDistance, heightMap, gridWidth, gridHeight, gridToWorld, checkCanHit, checkCanBeSeen]);
 
     useEffect(() => {
         if (!heightMap ) return;
@@ -290,7 +291,7 @@ const VisableMap = () => {
             }
         }
         setVisible(newVisibleGrid);
-    }, [enemyPosition]);
+    }, [enemyPosition, armorHeight, cameraHeight, gridHeight, gridToWorld, gridWidth, heightArray, heightMap, position, worldToGrid]);
     // 事件委托：在整个图像上监听点击事件
     const handleCanvasClick = (e: any) => {
         // 获取相对于 stage 的点击位置

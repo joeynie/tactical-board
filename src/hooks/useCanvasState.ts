@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Unit, Arrow } from "../types/type";
+import { Arrow } from "../types/type";
 import { useCanvasContext } from "../types/CanvasContext";
 
 export const useCanvasState = () => {
