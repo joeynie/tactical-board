@@ -3,6 +3,25 @@ import Hls from "hls.js";
 
 // 可选视频源
 const videoRecord: { label: string; url: string }[] = [];
+const remoteLiveGameInfoUrl = "https://rm-static.djicdn.com/live_json/live_game_info.json";
+const fallbackLiveGameInfoUrl = "/live_game_info_国赛2.json";
+
+async function fetchLiveGameInfo() {
+  try {
+    const response = await fetch(remoteLiveGameInfoUrl);
+    if (!response.ok) {
+      throw new Error(`Remote live info request failed: ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.warn("Failed to fetch remote live info, using local fallback.", error);
+    const fallbackResponse = await fetch(fallbackLiveGameInfoUrl);
+    if (!fallbackResponse.ok) {
+      throw new Error(`Fallback live info request failed: ${fallbackResponse.status}`);
+    }
+    return await fallbackResponse.json();
+  }
+}
 
 export default function Live() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -12,44 +31,58 @@ export default function Live() {
   const [zoneList, setZoneList] = useState<string[]>([]); 
 
   useEffect(() => {
-    fetch("/live_game_info_国赛2.json")
-      .then(res => res.json())
+    let cancelled = false;
+
+    fetchLiveGameInfo()
       .then(data => {
+        if (cancelled) return;
+
         const sources: { label: string; url: string }[] = [];
         const newZoneList: string[] = []; 
         for (const zone of data.eventData) {
           newZoneList.push(zone.zoneName);
           if (zone.zoneName === zoneName) {
-            if (zone.videos && zone.videos.length > 0) { // 回放
-              for (const video of zone.videos) {
-                if (video.content.title1 && video.content.main_source_url) {
+            const videos = Array.isArray(zone.videos) ? zone.videos : [];
+            const zoneLiveString = Array.isArray(zone.zoneLiveString) ? zone.zoneLiveString : [];
+            const fpvData = Array.isArray(zone.fpvData) ? zone.fpvData : [];
+
+            if (videos.length > 0) { // 回放
+              for (const video of videos) {
+                if (video.content?.title1 && video.content?.main_source_url) {
                   sources.push({ label: video.content.title1, url: video.content.main_source_url });
                 }
               }
-              setVideoSources([...videoRecord, ...sources]);
-              if (sources.length > 0) setSrc(sources[0].url);
             }
-            if (zone.zoneLiveString && zone.fpvData){ // 直播
-              console.log("zoneLiveString:", zone.zoneLiveString);
-              console.log("fpvData:", zone.fpvData);
 
-              for (const item of zone.zoneLiveString) {
+            if (zoneLiveString.length > 0 || fpvData.length > 0){ // 直播
+              console.log("zoneLiveString:", zoneLiveString);
+              console.log("fpvData:", fpvData);
+
+              for (const item of zoneLiveString) {
                 if (item && item.src && item.label) {
                   sources.push({ label: item.label, url: item.src });
                 }
               }
-              for (const item of zone.fpvData) {
-                if (item && item.sources && item.role) {
+              for (const item of fpvData) {
+                if (item && item.sources?.[0]?.src && item.role) {
                   sources.push({ label: item.role, url: item.sources[0].src });
                 }
               }
-              setVideoSources([...videoRecord, ...sources]);
-              if (sources.length > 0) setSrc(sources[0].url);
-            }  
+            }
+
+            setVideoSources([...videoRecord, ...sources]);
+            setSrc(sources[0]?.url ?? "");
           }
         }
         setZoneList(newZoneList);
+      })
+      .catch(error => {
+        console.error("Failed to load live game info.", error);
       });
+
+    return () => {
+      cancelled = true;
+    };
     
   }, [zoneName]);
 
