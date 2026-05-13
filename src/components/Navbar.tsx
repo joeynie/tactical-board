@@ -12,10 +12,10 @@ import CloseIcon from '@mui/icons-material/Close';
 
 // 导航项配置
 const navItems = [
-  { name: "战术面板", path: "/", icon: <DashboardIcon className="w-5 h-5" /> },
-  { name: "赛程分析", path: "/schedule", icon: <CalendarMonthIcon className="w-5 h-5" /> },
+  { name: "战术板", path: "/", icon: <DashboardIcon className="w-5 h-5" /> },
+  { name: "赛事雷达", path: "/schedule", icon: <CalendarMonthIcon className="w-5 h-5" /> },
   { name: "比赛直播", path: "/live", icon: <LiveTvIcon className="w-5 h-5" /> },
-  { name: "数据管理", path: "/data", icon: <BarChartIcon className="w-5 h-5" /> },
+  { name: "规则助手", path: "/data", icon: <BarChartIcon className="w-5 h-5" /> },
 ];
 
 // 美观的导航栏组件

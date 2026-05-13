@@ -1,88 +1,39 @@
 import { useEffect, useRef, useState } from "react";
 import Hls from "hls.js";
+import { getZoneSources, loadLiveGameInfo } from "../lib/liveGameInfo";
 
 // 可选视频源
 const videoRecord: { label: string; url: string }[] = [];
-const remoteLiveGameInfoUrl = "https://rm-static.djicdn.com/live_json/live_game_info.json";
-const proxyLiveGameInfoUrl = "/api/live-game-info";
-const fallbackLiveGameInfoUrl = "/live_game_info_国赛2.json";
-
-async function fetchJson(url: string) {
-  const response = await fetch(url, { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error(`${url} request failed: ${response.status}`);
-  }
-  return await response.json();
-}
-
-async function fetchLiveGameInfo() {
-  const urls = [remoteLiveGameInfoUrl, proxyLiveGameInfoUrl, fallbackLiveGameInfoUrl];
-  let lastError: unknown;
-
-  for (const url of urls) {
-    try {
-      return await fetchJson(url);
-    } catch (error) {
-      lastError = error;
-      console.warn(`Failed to fetch live info from ${url}.`, error);
-    }
-  }
-
-  throw lastError;
-}
 
 export default function Live() {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const [videoSources, setVideoSources] = useState<{ label: string; url: string }[]>(videoRecord);
   const [src, setSrc] = useState("");
-  const [zoneName, setZoneName] = useState("全国赛");
+  const [zoneName, setZoneName] = useState("");
   const [zoneList, setZoneList] = useState<string[]>([]); 
 
   useEffect(() => {
     let cancelled = false;
 
-    fetchLiveGameInfo()
-      .then(data => {
+    loadLiveGameInfo()
+      .then(({ data }) => {
         if (cancelled) return;
 
-        const sources: { label: string; url: string }[] = [];
-        const newZoneList: string[] = []; 
-        for (const zone of data.eventData) {
-          newZoneList.push(zone.zoneName);
-          if (zone.zoneName === zoneName) {
-            const videos = Array.isArray(zone.videos) ? zone.videos : [];
-            const zoneLiveString = Array.isArray(zone.zoneLiveString) ? zone.zoneLiveString : [];
-            const fpvData = Array.isArray(zone.fpvData) ? zone.fpvData : [];
+        const zones = data.eventData ?? [];
+        const newZoneList = zones.flatMap(zone => zone.zoneName ? [zone.zoneName] : []);
+        const selectedZoneName = newZoneList.includes(zoneName) ? zoneName : newZoneList[0] ?? "";
+        const selectedZone = zones.find(zone => zone.zoneName === selectedZoneName);
+        const sources = selectedZone
+          ? getZoneSources(selectedZone).map(source => ({
+              label: source.label,
+              url: source.url,
+            }))
+          : [];
 
-            if (videos.length > 0) { // 回放
-              for (const video of videos) {
-                if (video.content?.title1 && video.content?.main_source_url) {
-                  sources.push({ label: video.content.title1, url: video.content.main_source_url });
-                }
-              }
-            }
-
-            if (zoneLiveString.length > 0 || fpvData.length > 0){ // 直播
-              console.log("zoneLiveString:", zoneLiveString);
-              console.log("fpvData:", fpvData);
-
-              for (const item of zoneLiveString) {
-                if (item && item.src && item.label) {
-                  sources.push({ label: item.label, url: item.src });
-                }
-              }
-              for (const item of fpvData) {
-                if (item && item.sources?.[0]?.src && item.role) {
-                  sources.push({ label: item.role, url: item.sources[0].src });
-                }
-              }
-            }
-
-            setVideoSources([...videoRecord, ...sources]);
-            setSrc(sources[0]?.url ?? "");
-          }
-        }
         setZoneList(newZoneList);
+        if (selectedZoneName !== zoneName) setZoneName(selectedZoneName);
+        setVideoSources([...videoRecord, ...sources]);
+        setSrc(sources[0]?.url ?? "");
       })
       .catch(error => {
         console.error("Failed to load live game info.", error);
