@@ -4,23 +4,31 @@ import Hls from "hls.js";
 // 可选视频源
 const videoRecord: { label: string; url: string }[] = [];
 const remoteLiveGameInfoUrl = "https://rm-static.djicdn.com/live_json/live_game_info.json";
+const proxyLiveGameInfoUrl = "/api/live-game-info";
 const fallbackLiveGameInfoUrl = "/live_game_info_国赛2.json";
 
-async function fetchLiveGameInfo() {
-  try {
-    const response = await fetch(remoteLiveGameInfoUrl);
-    if (!response.ok) {
-      throw new Error(`Remote live info request failed: ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.warn("Failed to fetch remote live info, using local fallback.", error);
-    const fallbackResponse = await fetch(fallbackLiveGameInfoUrl);
-    if (!fallbackResponse.ok) {
-      throw new Error(`Fallback live info request failed: ${fallbackResponse.status}`);
-    }
-    return await fallbackResponse.json();
+async function fetchJson(url: string) {
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) {
+    throw new Error(`${url} request failed: ${response.status}`);
   }
+  return await response.json();
+}
+
+async function fetchLiveGameInfo() {
+  const urls = [remoteLiveGameInfoUrl, proxyLiveGameInfoUrl, fallbackLiveGameInfoUrl];
+  let lastError: unknown;
+
+  for (const url of urls) {
+    try {
+      return await fetchJson(url);
+    } catch (error) {
+      lastError = error;
+      console.warn(`Failed to fetch live info from ${url}.`, error);
+    }
+  }
+
+  throw lastError;
 }
 
 export default function Live() {

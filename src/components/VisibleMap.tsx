@@ -238,7 +238,7 @@ const VisableMap = () => {
     const imageRef = useRef<Konva.Image>(null);
     
     useEffect(() => {
-        if (!heightMap ) return;
+        if (!heightMap || heightArray.length === 0) return;
         const newVisibleGrid = Array(gridWidth).fill(0).map(() => Array(gridHeight).fill(false));
         const newBeVisibleGrid = Array(gridWidth).fill(0).map(() => Array(gridHeight).fill(false));
         const from = gridToWorld({ x: position[0], y: position[1] }); // 起点
@@ -252,10 +252,10 @@ const VisableMap = () => {
         }
         setVisible(newVisibleGrid);
         setBeVisible(newBeVisibleGrid);
-    }, [position, cameraHeight, armorHeight, aimDistance, heightMap, gridWidth, gridHeight, gridToWorld, checkCanHit, checkCanBeSeen]);
+    }, [position, cameraHeight, armorHeight, aimDistance, heightArray, heightMap, gridWidth, gridHeight, gridToWorld, checkCanHit, checkCanBeSeen]);
 
     useEffect(() => {
-        if (!heightMap ) return;
+        if (!heightMap || heightArray.length === 0) return;
         const from = gridToWorld({ x: position[0], y: position[1] });
         const to = gridToWorld({x: enemyPosition[0], y: enemyPosition[1]}); // 终点
 
