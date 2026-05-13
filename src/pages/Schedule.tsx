@@ -2,8 +2,6 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { getZoneSources, LiveGameInfo, LiveInfoSource, LiveZone, loadLiveGameInfo } from "../lib/liveGameInfo";
 
-type Filter = "all" | "live" | "replay";
-
 const sourceLabels: Record<LiveInfoSource, string> = {
   remote: "DJI 远程数据",
   proxy: "Vercel 代理数据",
@@ -21,8 +19,6 @@ export default function Schedule() {
   const [source, setSource] = useState<LiveInfoSource | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [query, setQuery] = useState("");
-  const [filter, setFilter] = useState<Filter>("all");
 
   useEffect(() => {
     let cancelled = false;
@@ -48,21 +44,14 @@ export default function Schedule() {
   }, []);
 
   const zones = useMemo(() => {
-    const normalizedQuery = query.trim().toLowerCase();
     return (info?.eventData ?? [])
       .map(zone => {
         const sources = getZoneSources(zone);
         const liveCount = sources.filter(item => item.kind === "live" || item.kind === "fpv").length;
         const replayCount = sources.filter(item => item.kind === "replay").length;
         return { zone, sources, liveCount, replayCount };
-      })
-      .filter(item => {
-        if (filter === "live" && item.liveCount === 0) return false;
-        if (filter === "replay" && item.replayCount === 0) return false;
-        if (!normalizedQuery) return true;
-        return item.zone.zoneName?.toLowerCase().includes(normalizedQuery);
       });
-  }, [filter, info, query]);
+  }, [info]);
 
   const liveZones = zones.filter(item => item.liveCount > 0).length;
   const replayZones = zones.filter(item => item.replayCount > 0).length;
